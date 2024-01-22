@@ -1,24 +1,28 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
-function copyFolder(fromDir, toDir) {
+async function copyFolder(sourceDir, destinationDir) {
+  try {
+    await fs.mkdir(destinationDir, { recursive: true });
 
-  if (!fs.existsSync(toDir)) {
-    fs.mkdirSync(toDir);
+    const files = await fs.readdir(sourceDir);
+
+    await Promise.all(files.map(async (file) => {
+      const sourcePath = path.join(sourceDir, file);
+      const destinationPath = path.join(destinationDir, file);
+
+      const isDir = (await fs.stat(sourcePath)).isDirectory();
+
+      if (isDir) {
+        await copyFolder(sourcePath, destinationPath);
+      } else {
+        await fs.copyFile(sourcePath, destinationPath);
+      }
+    }));
+
+  } catch (error) {
+    console.error('Error:', error);
   }
-
-  const files = fs.readdirSync(fromDir);
-
-  files.forEach((file) => {
-    const sourcePath = path.join(fromDir, file);
-    const destinationPath = path.join(toDir, file);
-    const isDir = fs.statSync(sourcePath).isDirectory();
-    if (isDir) {
-        copyFolder(sourcePath, destinationPath);
-    } else {
-      fs.copyFileSync(sourcePath, destinationPath);
-    }
-  });
 }
 
 copyFolder('./04-copy-directory/files', './04-copy-directory/files-copy');
