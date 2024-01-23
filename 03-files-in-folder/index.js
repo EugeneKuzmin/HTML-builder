@@ -18,12 +18,7 @@ function processFolder(folderPath) {
           console.error(`Error getting information for ${entry}:`, err);
           return;
         }
-
-        if (stats.isDirectory()) {
-          processFolder(entryPath);
-        } else {
-          console.log(`${path.parse(entry).name} - ${path.parse(entry).ext.slice(1)} - ${stats.size} byte`);
-        }
+        console.log(`${path.parse(entry).name} - ${path.parse(entry).ext.slice(1)} - ${stats.size} byte`);
       });
     });
   });
