@@ -3,6 +3,15 @@ const path = require('path');
 
 async function copyFolder(sourceDir, destinationDir) {
   try {
+
+    try {
+      await fs.rm(destinationDir, { recursive: true });
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
     await fs.mkdir(destinationDir, { recursive: true });
 
     const files = await fs.readdir(sourceDir);
